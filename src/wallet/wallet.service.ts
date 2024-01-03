@@ -49,7 +49,7 @@ export class WalletService {
         );
 
         if (walletTransactions.length > 0) {
-          wallet.balance = walletTransactions[ walletTransactions.length - 1 ].new_balance;
+          wallet.balance = walletTransactions[ 0 ].new_balance;
           wallet.balance_crypto = wallet.balance * wallet.coin.exchange;
         }
 
