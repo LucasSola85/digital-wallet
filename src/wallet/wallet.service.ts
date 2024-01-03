@@ -82,7 +82,7 @@ export class WalletService {
 
       if (transactions.length > 0) {
         // tomar el balance del ultimo elemento del array
-        wallet.balance = transactions[ transactions.length - 1 ].new_balance;
+        wallet.balance = transactions[ 0 ].new_balance;
         //transactions[0].new_balance;
         wallet.balance_crypto = wallet.balance * wallet.coin.exchange;
       }
