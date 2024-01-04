@@ -38,7 +38,8 @@ export class TransactionService {
         prev_balance,
         new_balance: createTransactionDto.isCredit 
         ? (prev_balance + createTransactionDto.amount) 
-        : (prev_balance - createTransactionDto.amount)
+        : (prev_balance - createTransactionDto.amount),
+        createdAt: new Date(),
       });
 
       const transaction = await newTransaction.save();
