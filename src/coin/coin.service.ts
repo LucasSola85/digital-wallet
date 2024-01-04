@@ -29,8 +29,13 @@ export class CoinService {
 
   }
 
-  findAll() {
-    return `This action returns all coin`;
+  async findAll() {
+    try {
+      const coins =await this.coinModel.find().exec();
+      return coins;
+    }catch (error) {
+      validateErrors(error);
+    }
   }
 
   findOne(id: number) {

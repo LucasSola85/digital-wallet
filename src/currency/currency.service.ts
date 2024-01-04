@@ -22,8 +22,15 @@ export class CurrencyService {
     }
   }
 
-  findAll() {
-    return `This action returns all currency`;
+  async findAll() {
+    try {
+      console.log('currency service');
+      const currencies = await this.currencyModel.find().exec();
+      return currencies;
+    } catch (error) {
+      validateErrors(error);
+    }
+
   }
 
   findOne(id: number) {
