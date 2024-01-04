@@ -3,7 +3,7 @@ import { CreateWalletDto } from './dto/create-wallet.dto';
 import { UpdateWalletDto } from './dto/update-wallet.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Wallet } from './entities/wallet.entity';
-import { Model, isValidObjectId } from 'mongoose';
+import { Model, Types, isValidObjectId } from 'mongoose';
 import { validateErrors } from 'src/common/helpers/validations';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 
@@ -49,7 +49,7 @@ export class WalletService {
         );
 
         if (walletTransactions.length > 0) {
-          wallet.balance = walletTransactions[ 0 ].new_balance;
+          wallet.balance = walletTransactions[0].new_balance;
           wallet.balance_crypto = wallet.balance * wallet.coin.exchange;
         }
 
@@ -82,7 +82,7 @@ export class WalletService {
 
       if (transactions.length > 0) {
         // tomar el balance del ultimo elemento del array
-        wallet.balance = transactions[ 0 ].new_balance;
+        wallet.balance = transactions[0].new_balance;
         //transactions[0].new_balance;
         wallet.balance_crypto = wallet.balance * wallet.coin.exchange;
       }
@@ -99,28 +99,40 @@ export class WalletService {
 
   async update(walletId: string, updateWalletDto: UpdateWalletDto) {
     try {
-      const wallet = await this.walletModel
-        .findById(walletId)
-        .select({
-          transactions: 0,
-          _id: 0,     
-          __v: 0   
-        });;
-
+      console.log('________entre__________')
       const { coin, currency } = updateWalletDto;
 
-
       if (!isValidObjectId(coin) || !isValidObjectId(currency)) {
-        return null;
+        return null; 
       }
 
-      await wallet.updateOne(updateWalletDto);
+      const coinObjectId = new Types.ObjectId(coin);
+      const currencyObjectId = new Types.ObjectId(currency);
 
-     
-      return wallet;
+      const result = await this.walletModel.updateOne(
+        { _id: walletId },
+        {
+          $set: {
+            coin: coinObjectId,
+            currency: currencyObjectId,
+          },
+        },
+      );
+
+      if (result.modifiedCount === 0) {
+        throw new Error(`No se actualizo nada, mantiene el mismo estado`);
+      }
+
+      const updatedWallet = await this.walletModel.findById(walletId).select({
+        transactions: 0,
+        _id: 0,
+        __v: 0,
+      });
+
+      return updatedWallet;
 
     } catch (error) {
-      console.log(error)
+      console.log(error);
       validateErrors(error);
     }
   }
